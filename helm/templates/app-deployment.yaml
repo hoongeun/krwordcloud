@@ -1,0 +1,6 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wordcloud.fullname" . }}-app-deployment
+  labels:
+    {{- include "wordcloud.labels" . | nindent 4 }}

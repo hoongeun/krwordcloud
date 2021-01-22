@@ -1,0 +1,63 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: hadoop-master
+  namespace: hadoop
+  labels:
+    name: hadoop-master-services
+spec:
+  selector:
+    name: hadoop-master
+  ports:
+  - name: port-0 # yarn.resourcemanager.scheduler.address
+    port: 8030
+  - name: port-1 # yarn.resourcemanager.resource-tracker.address
+    port: 8031
+  - name: port-2 # yarn.resourcemanager.address
+    port: 8032
+  - name: port-3 # yarn.resourcemanager.admin.address
+    port: 8033
+  - name: port-4 # yarn.nodemanager.localizer.address
+    port: 8040
+  - name: port-5 # yarn.nodemanager.webapp.address
+    port: 8042
+  - name: port-6 # yarn.resourcemanager.webapp.address
+    port: 8088
+  - name: port-7 # yarn.resourcemanager.webapp.https.address
+    port: 8090
+  - name: port-8 # yarn.timeline-service.webapp.address
+    port: 8188
+  - name: port-9 # namenode IPC port
+    port: 9000
+  - name: port-10 # dfs.datanode.http.address
+    port: 9864
+  - name: port-11 # dfs.datanode.https.address
+    port: 9865
+  - name: port-12 # dfs.datanode.address
+    port: 9866
+  - name: port-13 # dfs.datanode.ipc.address
+    port: 9867
+  - name: port-14 # dfs.namenode.secondary.http-address
+    port: 9868
+  - name: port-15 # dfs.namenode.secondary.https-address
+    port: 9869
+  - name: port-16 # dfs.namenode.http-address
+    port: 9870
+  - name: port-17 # dfs.namenode.https-address
+    port: 9871
+  - name: port-18 # mapreduce.jobhistory.address
+    port: 10020
+  - name: port-19 # mapreduce.jobhistory.admin.address
+    port: 10033
+  - name: port-20 # mapreduce.shuffle.port
+    port: 13562
+  - name: port-21 # mapreduce.jobhistory.webapp.address
+    port: 19888
+  - name: port-22 # mapreduce.jobhistory.webapp.https.address
+    port: 19889
+  - name: port-23
+    port: 33011
+  - name: port-24
+    port: 37319
+  - name: port-25
+    port: 40469

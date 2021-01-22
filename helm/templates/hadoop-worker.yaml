@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "wordcloud.fullname" . }}-hadoop-worker
+  namespace: hadoop
+spec:
+  selector:
+    matchLabels:
+      name: {{ include "wordcloud.fullname" . }}-hadoop-worker
+  template:
+    metadata:
+      labels:
+        name: {{ include "wordcloud.fullname" . }}-hadoop-worker
+    spec:
+      hostNetwork: true
+      serviceAccountName: {{ include "wordcloud.fullname" . }}-hadoop-master
+      containers:
+      - name: {{ include "wordcloud.fullname" . }}-hadoop-worker
+        image: eiswar/hadoop:3.1.2
+        command: ["/usr/local/hadoop/sbin/bootstrap.sh"]
+        args: ["worker"]
+        volumeMounts:
+        - mountPath: /hdfs
+          name: {{ include "wordcloud.fullname" . }}-hdfs-data
+      volumes:
+      - name: {{ include "wordcloud.fullname" . }}-hdfs-data
+        hostPath:
+          path: /hdfs

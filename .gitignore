@@ -4,6 +4,10 @@
 ### User Defined ignore ###
 output/
 
+### Vagrant ####
+/vagrant/id_rsa.pub
+/vagrant/join.sh
+
 ### Emacs ###
 # -*- mode: gitignore; -*-
 *~

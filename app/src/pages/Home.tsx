@@ -1,11 +1,14 @@
 import * as React from "react";
-import WordCloud, { OptionsProp } from "react-wordcloud";
-import moment, { Moment, MomentInputObject } from "moment";
+import WordCloud, { OptionsProp, CallbacksProp, Word } from "react-wordcloud";
+import moment, { Moment } from "moment";
 import axios from "axios";
 import prettyBytes from "pretty-bytes";
 import { useHistory, Link } from "react-router-dom";
 import DateRangePicker from '../components/DateRangerPicker'
 import { useQuery } from "../hooks/query";
+import { env } from "process";
+
+const DATE_MOMENT_FORMAT = 'YYYYMMDD'
 
 const words = [
   {
@@ -580,6 +583,14 @@ function App() {
     transitionDuration: 1000,
   };
 
+  const callbacks: CallbacksProp = {
+    onWordClick: (word: Word, event?: MouseEvent) => {
+      if (word.lenght > 0) {
+        window.location.href = `https://search.naver.com/search.naver?query=${encodeURIComponent(word.text)}&nso=${encodeURIComponent(`p:from${start.format(DATE_MOMENT_FORMAT)}to${end.format(DATE_MOMENT_FORMAT)}`)}`
+      }
+    }
+  }
+
   // do not re-render when start and end are changed
   React.useEffect(() => {
     if (start && start.isAfter(end)) {
@@ -651,7 +662,7 @@ function App() {
           </Link>
         </div>
         <div className="">
-          <WordCloud words={words} options={options} />
+          <WordCloud words={words} options={options} callbacks={callbacks} />
         </div>
       </main>
       <footer className=""></footer>

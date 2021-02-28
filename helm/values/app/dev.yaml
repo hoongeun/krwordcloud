@@ -1,0 +1,6 @@
+nameOverride: app-dev
+host: http://localhost
+port: 3000
+app:
+  host: http://localhost
+  port: 4000

@@ -1,84 +1,232 @@
-# Default values for wordcloud.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
-replicaCount: 1
-
-image:
-  repository: nginx
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
-
 app:
-  image: wordcloud:latest
-  pullPolicy: IfNotPresent
-
-
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
-
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
-
-podAnnotations: {}
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
-service:
-  type: ClusterIP
-  port: 80
-
+  host: http://localhost
+  port: 3000
+  image:
+    name: krwordcloud/app
+    pullPolicy: Never
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: latest
+  service:
+    type: NodePort 
+    name: krwordcloud-app
+    port: 80
+  livenessProbe:
+    enabled: false
+    initialDelaySeconds: 120
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  readinessProbe:
+    enabled: false
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  resources: {}
+  livenessProbeHeaders: {}
+  readinessProbeHeaders: {}
+  healthcheckHttps: false
+api:
+  host: http://localhost
+  port: 4000
+  image:
+    name: krwordcloud/api
+    pullPolicy: Never
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: latest
+  service:
+    type: NodePort 
+    name: krwordcloud-api
+    port: 4000
+  livenessProbe:
+    enabled: false
+    initialDelaySeconds: 120
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  readinessProbe:
+    enabled: false
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  resources: {}
+  livenessProbeHeaders: {}
+  readinessProbeHeaders: {}
+  healthcheckHttps: false
 ingress:
-  enabled: false
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  enabled: true
+  tls: false
   hosts:
-    - host: chart-example.local
-      paths: []
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+    - host: localhost:3000 
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: krwordlcoud-app
+              port: 80
+    - host: localhost:4000
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: krwordlcoud-api
+              port: 4000
 
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+airflow:
+  nameOverride: airflow
+  ###################################
+  # Airflow - Common Configs
+  ###################################
+  airflow:
+    ## the airflow executor type to use
+    ##
+    executor: PythonExecutor
 
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+    ## the fernet key used to encrypt the connections in the database
+    ##
+    fernetKey: "7T512UXSSmBOkpWimFHIVb8jK6lfmSAvx4mO6Arehnc="
 
-nodeSelector: {}
+    extraVolumeMounts: # this will get the volume and mount it to that path in the container
+      - name: dags
+        mountPath: "$HOME/workspace/git/wordcloud/airflow/dags"  # location in the container it will put the directory mentioned below.
 
-tolerations: []
+    extraVolumes: # this will create the volume from the directory
+      - name: dags
+        hostPath:
+          path: /opt/airflow/dags
 
-affinity: {}
+    ## environment variables for the web/scheduler/worker Pods (for airflow configs)
+    ##
+    config:
+      # Security
+      AIRFLOW__CORE__SECURE_MODE: "True"
+      AIRFLOW__API__AUTH_BACKEND: "airflow.api.auth.backend.deny_all"
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "False"
+      AIRFLOW__WEBSERVER__RBAC: "False"
+
+      # DAGS
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+
+      ## Disable noisy "Handling signal: ttou" Gunicorn log messages
+      GUNICORN_CMD_ARGS: "--log-level WARNING"
+    env:
+      KAFKA_BROKERS:
+        - "kafka-broker"
+
+  ###################################
+  # Airflow - Scheduler Configs
+  ###################################
+  scheduler:
+
+    ## custom airflow connections for the airflow scheduler
+    ##
+    # connections:
+    #   - id: my_aws
+    #     type: aws
+    #     extra: |
+    #       {
+    #         "aws_access_key_id": "XXXXXXXXXXXXXXXXXXX",
+    #         "aws_secret_access_key": "XXXXXXXXXXXXXXX",
+    #         "region_name":"eu-central-1"
+    #       }
+    ## custom airflow variables for the airflow scheduler
+    ##
+    variables: |
+      { "environment": "dev" }
+    ## custom airflow pools for the airflow scheduler
+    ##
+    pools: |
+      {
+        "example": {
+          "description": "This is an example pool with 2 slots.",
+          "slots": 2
+        }
+      }
+  ###################################
+  # Airflow - WebUI Configs
+  ###################################
+  web:
+    ## configs for the Service of the web Pods
+    ##
+    service:
+      type: NodePort
+
+  ###################################
+  # Airflow - Worker Configs
+  ###################################
+  workers:
+    ## the number of workers Pods to run
+    ##
+    replicas: 1
+
+  ###################################
+  # Airflow - DAGs Configs
+  ###################################
+  dags:
+    persistence:
+      enabled: true
+      
+
+  ###################################
+  # Database - PostgreSQL Chart
+  ###################################
+  postgresql:
+    enabled: false
+
+  ###################################
+  # Database - Redis Chart
+  ###################################
+  redis:
+    enabled: true
+
+kafka:
+  nameOverride: kafka
+  cp-zookeeper:
+    enabled: true
+    servers: 1
+hive:
+  nameOverride: hive
+  persistence:
+    nameNode:
+      enabled: true
+      storageClass: standard-ssd
+      accessMode: ReadWriteOnce
+      size: 10Gi
+    dataNode:
+      enabled: true
+      storageClass: standard-sdd
+      accessMode: ReadWriteOnce
+      size: 10Gi
+
+couchbase-operator:
+  # Select what to install
+  install:
+    # install the couchbase operator
+    couchbaseOperator: true
+    # install the admission controller
+    admissionController: true
+    # install couchbase cluster
+    couchbaseCluster: true
+    # install sync gateway
+    syncGateway: false
+  cluster:
+    security:
+      adminSecret: couchbase-secret
+    cluster:
+  bucket: trend
+
+prometheus:
+  nameOverride: prometheus
+grafana:
+  nameOverride: grafana
+  service:
+    type: NodePort
+    port: 80
+    targetPort: 5005

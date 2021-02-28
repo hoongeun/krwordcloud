@@ -1,0 +1,3 @@
+nameOverride: api-prod
+host: http://api.krwordcloud.com
+port: 4001

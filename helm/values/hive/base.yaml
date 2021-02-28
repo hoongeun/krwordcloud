@@ -1,0 +1,12 @@
+nameOverride: hive
+persistence:
+  nameNode:
+    enabled: true
+    storageClass: standard-ssd
+    accessMode: ReadWriteOnce
+    size: 2Gi
+  dataNode:
+    enabled: true
+    storageClass: standard-sdd
+    accessMode: ReadWriteOnce
+    size: 5Gi

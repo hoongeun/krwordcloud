@@ -1,0 +1,3 @@
+nameOverride: api-dev
+host: http://localhost
+port: 4000

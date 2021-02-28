@@ -1,0 +1,11 @@
+nameOverride: api
+host: http://localhost
+port: 4000
+image:
+  repository: krwordcloud/api
+  tag: "0.0.1"
+couchbase:
+  host: couchbase
+  user: user
+prometheus:
+  enabled: false

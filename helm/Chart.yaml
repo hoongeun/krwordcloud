@@ -1,6 +1,6 @@
 apiVersion: v2
-name: wordcloud
-description: This project extract from
+name: krwordcloud
+description: Korean word cloud service with hadoop ecosystem
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -23,24 +23,24 @@ version: 0.1.0
 appVersion: 1.16.0
 
 dependencies:
-  - name: zookeeper
-    repository: https://charts.bitnami.com/bitnami
-    version: 6.3.0
-  - name: hdfs
-    repository: https://gradiant.github.io/charts
-    version: 0.1.10
-  - name: hbase
-    repository: https://gradiant.github.io/charts
-    version: 0.1.6
-  - name: hive
-    repository: https://gradiant.github.io/charts
-    version: 0.1.6
-  - name: airflow
-    repository: https://airflow-helm.github.io/charts
-    version: 7.16.0
-  - name: kafka
-    repository: https://charts.bitnami.com/bitnami
-    version: 12.5.0
-  - name: spark
-    repository: https://charts.bitnami.com/bitnami
-    version: 4.4.1
+  # - name: airflow
+  #   repository: https://airflow-helm.github.io/charts
+  #   version: 7.16.0
+  - name: couchbase-operator
+    repository: https://couchbase-partners.github.io/helm-charts/
+    version: 2.1.7
+  # - name: cp-helm-charts
+  #   repository: https://confluentinc.github.io/cp-helm-charts/
+  #   version: 0.6.0
+  # - name: grafana
+  #   repository: https://grafana.github.io/helm-charts
+  #   version: 6.2.1
+  # - name: hive
+  #   repository: https://gradiant.github.io/charts
+  #   version: 0.1.6
+  # - name: prometheus
+  #   repository: https://prometheus-community.github.io/helm-charts
+  #   version: 13.2.1
+  # - name: spark-operator
+  #   repository: https://googlecloudplatform.github.io/spark-on-k8s-operator
+  #   version: 1.0.7

@@ -1,0 +1,7 @@
+nameOverride: app
+host: http://localhost
+api:
+  host: http://localhost
+  port: 4000
+prometheus:
+  enabled: false

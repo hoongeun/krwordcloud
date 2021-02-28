@@ -1,6 +1,80 @@
-apiVersion: apps/v1
 kind: Deployment
+apiVersion: apps/v1
 metadata:
-  name: {{ include "wordcloud.fullname" . }}-app-deployment
-  labels:
-    {{- include "wordcloud.labels" . | nindent 4 }}
+  name: {{ template "krwordcloud.fullname" . }}-app-deployment
+  labels: {{- include "krwordcloud.app.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels: {{- include "krwordcloud.app.matchLabels" . | nindent 6 }}
+  {{- if .Values.updateStrategy }}
+  strategy: {{ toYaml .Values.updateStrategy | nindent 4 }}
+  {{- end }}
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        {{- include "krwordcloud.app.matchLabels" . | nindent 9 }}
+    spec:
+      hostAliases:
+        - ip: "127.0.0.1"
+          hostnames:
+            - "status.localhost"
+      {{- if .Values.affinity }}
+      affinity: {{- include "krwordcloud.tplValue" (dict "value" .Values.affinity "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector: {{- include "krwordcloud.tplValue" (dict "value" .Values.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations: {{- include "krwordcloud.tplValue" (dict "value" .Values.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: app-krwordcloud
+          image: "{{ .Values.app.image.name }}:{{ .Values.app.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.app.image.pullPolicy | quote }}
+          env:
+            - name: API_HOST
+              value: {{ include "krwordcloud.fullname" . }}-api
+          ports:
+            - name: http
+              containerPort: 3000
+            - name: https
+              containerPort: 3001
+          {{- if .Values.app.livenessProbe.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.app.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.app.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.app.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.app.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.app.livenessProbe.failureThreshold }}
+            httpGet:
+              path: /
+              port: {{ ternary "https" "http" .Values.app.healthcheckHttps }}
+              {{- if .Values.app.healthcheckHttps }}
+              scheme: HTTPS
+              {{- end }}
+              {{- if .Values.app.livenessProbeHeaders }}
+              httpHeaders: {{- toYaml .Values.app.livenessProbeHeaders | nindent 16 }}
+              {{- end }}
+          {{- end }}
+          {{- if .Values.app.readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.app.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.app.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.app.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.app.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.app.readinessProbe.failureThreshold }}
+            httpGet:
+              path: /
+              port: {{ ternary "https" "http" .Values.app.healthcheckHttps }}
+              {{- if .Values.app.healthcheckHttps }}
+              scheme: HTTPS
+              {{- end }}
+              {{- if .Values.app.readinessProbeHeaders }}
+              httpHeaders: {{- toYaml .Values.app.readinessProbeHeaders | nindent 16 }}
+              {{- end }}
+          {{- end }}
+          {{- if .Values.app.resources }}
+          resources: {{- toYaml .Values.app.resources | nindent 12 }}
+          {{- end }}
+   

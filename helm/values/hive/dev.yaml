@@ -1,0 +1,6 @@
+nameOverride: hive-dev
+persistence:
+  nameNode:
+    size: 10Gi
+  dataNode:
+    size: 100Gi

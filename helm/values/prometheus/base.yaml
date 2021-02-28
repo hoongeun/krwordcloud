@@ -1,0 +1,4 @@
+nameOverride: prometheus
+server:
+  persistentVolume:
+    mountPath: $HOME/docker/prometheus/

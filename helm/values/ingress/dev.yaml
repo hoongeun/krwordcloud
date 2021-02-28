@@ -1,0 +1,19 @@
+enabled: true
+tls: false
+hosts:
+  - host: app-dev
+    paths:
+      - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app
+                port: 3000
+  - host: api-dev
+    paths:
+      - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port: 4000

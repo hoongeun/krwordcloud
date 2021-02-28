@@ -1,0 +1,9 @@
+nameOverride: hive-prod
+persistence:
+  nameNode:
+    size: 60Gi
+  dataNode:
+    enabled: true
+    storageClass: standard-hdd
+    accessMode: ReadWriteOnce
+    size: 120Gi

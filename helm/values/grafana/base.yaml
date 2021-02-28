@@ -1,0 +1,9 @@
+nameOverride: grafana
+datasources:
+  apiVersion: 1
+  datasources:
+  - name: Prometheus
+    type: prometheus
+    url: prometheus
+    access: proxy
+    isDefault: true

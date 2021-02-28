@@ -1,0 +1,2 @@
+nameOverride: spark
+sparkJobNamespace: krwordcloud

@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "krwordcloud.fullname" . }}-app-service
+  labels: {{- include "krwordcloud.app.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.app.service.type }}
+  ports:
+    - name: {{ .Values.app.service.name }} 
+      protocol: TCP
+      port: {{ .Values.app.service.port }}
+  selector: 
+    {{- include "krwordcloud.app.matchLabels" . | nindent 4 }}

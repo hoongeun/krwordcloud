@@ -1,0 +1,4 @@
+nameOverride: kafka-dev
+cp-zookeeper:
+  enabled: true
+  servers: 1

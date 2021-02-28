@@ -1,0 +1,2 @@
+nameOverride: grafana-prod
+enabled: true

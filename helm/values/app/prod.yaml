@@ -1,0 +1,6 @@
+nameOverride: prod
+host: https://krwordcloud.com
+port: 443
+api:
+  host: https://api.krwordcloud.com
+  port: 443

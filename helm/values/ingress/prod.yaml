@@ -1,0 +1,19 @@
+enabled: true
+tls: false
+hosts:
+  - host: app.krwordcloud.com
+    paths:
+      - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app
+                port: 443
+  - host: api.krwordcloud.com
+    paths:
+      - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port: 443

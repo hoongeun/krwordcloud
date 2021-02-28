@@ -1,0 +1,11 @@
+nameOverride: couchbase
+# Select what to install
+install:
+  # install the couchbase operator
+  couchbaseOperator: true
+  # install the admission controller
+  admissionController: true
+  # install couchbase cluster
+  couchbaseCluster: true
+  # install sync gateway
+  syncGateway: false

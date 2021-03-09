@@ -6,8 +6,6 @@ import json
 from bs4 import BeautifulSoup
 from time import sleep
 from multiprocessing import Process
-from korea_news_crawler.exceptions import *
-from korea_news_crawler.writer import Writer
 
 
 class SportCrawler:

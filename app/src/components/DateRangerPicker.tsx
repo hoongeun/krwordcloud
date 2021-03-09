@@ -57,9 +57,9 @@ const defaultProps: Omit<
   navPosition: "navPositionTop",
   navPrev: null,
   navNext: null,
-  onPrevMonthClick() {},
-  onNextMonthClick() {},
-  onClose() {},
+  onPrevMonthClick() { },
+  onNextMonthClick() { },
+  onClose() { },
 
   // day presentation and interaction related props
   renderCalendarDay: undefined,
@@ -127,6 +127,22 @@ const DateRangePickerWrapper: React.FC<DateRangePickerProps> = (props) => {
       endDate={props.endDate}
       renderMonthText={null}
       renderMonthElement={undefined}
+      isOutsideRange={(day) => {
+        if (focusedInput === "startDate") {
+
+          // Start date is not after today and not after end date and not before 2 years ago. 
+          return day.isAfter(moment(new Date())) || day.isBefore(moment('2021-01-01'));
+        }
+
+        if (focusedInput === "endDate") {
+
+          // End date is not after today and not before start date
+          return day.isAfter(moment(new Date()));
+        }
+
+        return false;
+      }}
+
     />
   );
 };

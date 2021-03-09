@@ -2,13 +2,10 @@ import * as React from "react";
 import WordCloud, { OptionsProp, CallbacksProp, Word } from "react-wordcloud";
 import moment, { Moment } from "moment";
 import axios from "axios";
-import prettyBytes from "pretty-bytes";
-import { useHistory, Link } from "react-router-dom";
-import DateRangePicker from '../components/DateRangerPicker'
+import { useHistory } from "react-router-dom";
+import ControlPanel from '../components/ControlPanel';
+import Message from '../components/Message'
 import { useQuery } from "../hooks/query";
-import { env } from "process";
-
-const DATE_MOMENT_FORMAT = 'YYYYMMDD'
 
 const words = [
   {
@@ -537,36 +534,23 @@ const calcFontSize = (width: number): [number, number] => {
   return [10, 60];
 };
 
-const message = (start: Moment, end: Moment) => {
-  if (start.diff(end, "month") <= 1) {
-    return `${end.year()}년 ${end.month()}월엔 대한민국에 어떤 일이 있었나요?`;
-  }
-
-  return `${start.year()}년 ${start.month()}월과 ${end.year()}년 ${end.month()}월엔 대한민국에 어떤 일이 있었나요?`;
-};
-
 function App() {
   const query = useQuery();
   const history = useHistory();
-  const [page, setPage] = React.useState({
+  const [page, setPage] = React.useState<{
+    loaded: boolean,
+    minStart: Date|null,
+    maxEnd: Date|null,
+    size: number
+  }>({
     loaded: false,
-    min: null,
-    max: null,
-    dataSize: 0,
+    minStart: null,
+    maxEnd: null,
+    size: 0,
   });
 
-  const [start, setStart] = React.useState<Moment>(
-    query.get("start")
-      ? moment(query.get("start"))
-      : moment().subtract(1, "m")
-  );
-  const [end, setEnd] = React.useState<Moment>(
-    query.get("end")
-      ? moment(query.get("end"))
-      : moment().subtract(1, "d")
-  );
-
-  const [section, setSection] = React.useState("it");
+  const start = moment(query.get("start")).isValid() ? moment(query.get("start")) : moment().subtract(1, "m");
+  const end = moment(query.get("end")).isValid() ? moment(query.get("end")) : moment().subtract(1, "d");
 
   const options: OptionsProp = {
     enableTooltip: true,
@@ -585,84 +569,59 @@ function App() {
 
   const callbacks: CallbacksProp = {
     onWordClick: (word: Word, event?: MouseEvent) => {
+      const NAVER_DATE_FORMAT = 'YYYYMMDD'
       if (word.lenght > 0) {
-        window.location.href = `https://search.naver.com/search.naver?query=${encodeURIComponent(word.text)}&nso=${encodeURIComponent(`p:from${start.format(DATE_MOMENT_FORMAT)}to${end.format(DATE_MOMENT_FORMAT)}`)}`
+        window.location.href = `https://search.naver.com/search.naver?query=${encodeURIComponent(word.text)}&nso=${encodeURIComponent(`p:from${start.format(NAVER_DATE_FORMAT)}to${end.format(NAVER_DATE_FORMAT)}`)}`
       }
     }
   }
 
   // do not re-render when start and end are changed
   React.useEffect(() => {
-    if (start && start.isAfter(end)) {
+    if (start.isAfter(end)) {
       history.push("/");
+      return;
     }
     async function loadPage() {
       const { data } = await axios.get("api.krwordcloud.com/trend");
       setPage({
         loaded: true,
-        min: data.minDate,
-        max: data.maxDate,
-        dataSize: data.dataSize,
+        minStart: data.minStart,
+        maxEnd: data.maxEnd,
+        size: data.size,
       });
     }
 
     // loadPage();
-  }, [start, end, history]);
+  }, []);
 
   if (false && !page.loaded) {
     return <h1>Loading...</h1>;
   }
 
   return (
-    <div className={"container"}>
+    <div className="h-screen w-screen">
       <header></header>
-      <main className={"main"}>
-        <div className={"message"}>
-          <h1>{message(start, end)}</h1>
-          <h4>{prettyBytes(192311092841984)}의 데이터를 분석하였습니다.</h4>
+      <main className="w-full h-full">
+        <div className="w-full" style={{height: 100}}>
+          <Message start={start} end={end} size={15812378912} />
         </div>
-        <div className="">
-          <select onBlur={(e) => setSection(e.target.value)}>
-            <option value="all">all</option>
-            <option value="it">it</option>
-            <option value="social">social</option>
-            <option value="economy">economy</option>
-            <option value="culture">culture</option>
-          </select>
-          {/* <DateRangePicker
-            startDate={start}
-            endDate={end}
-            onDatesChange={({ startDate, endDate }): void => {
-              if (startDate !== null && start !== startDate) {
-                setStart(startDate);
-              }
-              if (endDate !== null && end !== endDate) {
-                setEnd(end);
-              }
-            }}
-          /> */}
-          <DateRangePicker 
-            startDate={start}
-            endDate={end}
-            onDatesChange={({ startDate, endDate }): void => {
-              if (startDate !== null && start !== startDate) {
-                setStart(startDate);
-              }
-              if (endDate !== null && end !== endDate) {
-                setEnd(end);
-              }
-            }}
+        <div className="fixed top-2 right-2">
+          <ControlPanel
+            defaultStart={start}
+            defaultEnd={end}
+            defaultCategories={[]}
+            defaultPresses={[]}
+            pressOptions={[]}
           />
-          <Link
-            to={`/wordcloud?start=${start.year()}-${start.month()}&end=${end.year()}-${end.month()}&section=${section}`}
-          >
-            <button type="button" className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              Update
-            </button>
-          </Link>
+
         </div>
-        <div className="">
-          <WordCloud words={words} options={options} callbacks={callbacks} />
+        <div className="w-full" style={{height: "calc(100% - 100px)"}}>
+          <WordCloud
+            words={words}
+            options={options}
+            callbacks={callbacks}
+          />
         </div>
       </main>
       <footer className=""></footer>

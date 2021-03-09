@@ -1,3 +1,13 @@
+# airflow
+
+/airflow/venv/
+/airflow/airflow.cfg
+/airflow/airflow.db
+/airflow/unittests.cfg
+/airflow/webserver_config.py
+/airflow/logs
+
+
 # Created by https://www.toptal.com/developers/gitignore/api/windows,macos,linux,visualstudiocode,vim,emacs,java,node,python,helm
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,linux,visualstudiocode,vim,emacs,java,node,python,helm
 

@@ -1,0 +1,12 @@
+spring:
+  couchbase:
+    host: ${COUCHBASE_HOST}
+    bucket:
+      name: ${COUCHBASE_BUCKET}
+      user: ${COUCHBASE_USER}
+      password: ${COUCHBASE_PASSWORD}
+    auto-index: true
+
+logging:
+  level:
+    org.springframework.data.couchbase.repository.query: DEBUG

@@ -26,13 +26,13 @@ def crawl():
 
     entries = make_entries(presto, categories)
     crawler = ArticleCrawler(entries, write_row_handler)
-    timer = Timer(30, lambda: (
+    timer = Timer(3540, lambda: (
         timer.cancel(),
         crawler.stop()
     ))
     timer.start()
     try:
-        crawler.start()    
+        crawler.start()
     except Exception as e:
         print(e)
         crawler.stop()
@@ -65,19 +65,17 @@ def make_entries(presto: PrestoDB, categories: list[str]):
             entries[category] = last_crawled_date
     return entries
 
-crawl()
 
+dag = DAG(dag_id="crawl_articles",
+          default_args={
+              "owner": "krwordcloud",
+              "start_date": datetime(2010, 1, 1)
+          },
+          schedule_interval="@hourly",
+          description="The task to crawl the korean news")
 
-# dag = DAG(dag_id="crawl_articles",
-#           default_args={
-#               "owner": "krwordcloud",
-#               "start_date": datetime(2010, 1, 1)
-#           },
-#           schedule_interval="@hourly",
-#           description="The task to crawl the korean news")
+crawl = PythonOperator(task_id="KoreaNewsCrawler",
+                       python_callable=crawl,
+                       dag=dag)
 
-# crawl = PythonOperator(task_id="KoreaNewsCrawler",
-#                        python_callable=crawl,
-#                        dag=dag)
-
-# crawl
+crawl

@@ -1,11 +1,8 @@
 import os
-import sys
-import locale
 from threading import Timer
 from airflow.models import DAG
-from airflow.utils.dates import days_ago
 from airflow.operators.python import PythonOperator
-from datetime import datetime, date, timedelta
+from datetime import datetime
 from news_crawler.articlecrawler import ArticleCrawler
 from db.presto import PrestoDB
 
@@ -16,10 +13,10 @@ def crawl():
     entries = dict()
 
     presto = PrestoDB(
-        host=os.environ.get('TRINO_HOST', 'localhost'),
-        port=int(os.environ.get('TRINO_PORT', 8080)),
-        user=os.environ.get('TRINO_USER', 'user'),
-        password=os.environ.get('TRINO_PASSWORD', 'password'))
+        host=os.environ.get('PRESTO_HOST', 'localhost'),
+        port=int(os.environ.get('PRESTO_PORT', 8080)),
+        user=os.environ.get('PRESTO_USER', 'user'),
+        password=os.environ.get('PRESTO_PASSWORD', 'password'))
 
     def write_row_handler(row: tuple[datetime, str, str, str, str, str]):
         presto.insert_row(row)
@@ -45,14 +42,16 @@ def make_entries(presto: PrestoDB, categories: list[str]):
 
     def last_crawled_data(category_name: str):
         cursor = presto.conn.cursor()
-        query = f"SELECT max(date) FROM article WHERE category = '{category_name}'"
+        query = f"SELECT max(date) FROM article WHERE category \
+            = '{category_name}'"
         cursor.execute(query)
         last_crawled = cursor.fetchone()
-        if last_crawled == None or last_crawled[0] == None:
+        if last_crawled is None or last_crawled[0] is None:
             return None
         else:
             print(
-                f"last crawled time of {category_name} is {str(last_crawled[0])}")
+                f"last crawled time of {category_name} is \
+                    {str(last_crawled[0])}")
             return datetime.fromisoformat(str(last_crawled[0]))
 
     for category in categories:

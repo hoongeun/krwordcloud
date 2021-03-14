@@ -1,4 +1,9 @@
 app:
+<<<<<<< HEAD
+=======
+  host: http://localhost
+  port: 3000
+>>>>>>> 9c280ca8cb5d26bc0449c4e9f0d691169c1b0531
   image:
     name: krwordcloud/app
     pullPolicy: Never
@@ -8,7 +13,10 @@ app:
     type: NodePort 
     name: krwordcloud-app
     port: 80
+<<<<<<< HEAD
     nodePort: 30000
+=======
+>>>>>>> 9c280ca8cb5d26bc0449c4e9f0d691169c1b0531
   livenessProbe:
     enabled: false
     initialDelaySeconds: 120
@@ -38,8 +46,12 @@ api:
   service:
     type: NodePort 
     name: krwordcloud-api
+<<<<<<< HEAD
     port: 8080
     nodePort: 30001
+=======
+    port: 4000
+>>>>>>> 9c280ca8cb5d26bc0449c4e9f0d691169c1b0531
   livenessProbe:
     enabled: false
     initialDelaySeconds: 120
@@ -59,7 +71,11 @@ api:
   readinessProbeHeaders: {}
   healthcheckHttps: false
 ingress:
+<<<<<<< HEAD
   enabled: false
+=======
+  enabled: true
+>>>>>>> 9c280ca8cb5d26bc0449c4e9f0d691169c1b0531
   tls: false
   hosts:
     - host: localhost:3000 
@@ -80,11 +96,18 @@ ingress:
               port: 4000
 
 airflow:
+<<<<<<< HEAD
+=======
+  nameOverride: airflow
+>>>>>>> 9c280ca8cb5d26bc0449c4e9f0d691169c1b0531
   ###################################
   # Airflow - Common Configs
   ###################################
   airflow:
+<<<<<<< HEAD
     nameOverride: airflow
+=======
+>>>>>>> 9c280ca8cb5d26bc0449c4e9f0d691169c1b0531
     ## the airflow executor type to use
     ##
     executor: PythonExecutor
@@ -95,7 +118,11 @@ airflow:
 
     extraVolumeMounts: # this will get the volume and mount it to that path in the container
       - name: dags
+<<<<<<< HEAD
         mountPath: "../airflow/dags"  # location in the container it will put the directory mentioned below.
+=======
+        mountPath: "$HOME/workspace/git/wordcloud/airflow/dags"  # location in the container it will put the directory mentioned below.
+>>>>>>> 9c280ca8cb5d26bc0449c4e9f0d691169c1b0531
 
     extraVolumes: # this will create the volume from the directory
       - name: dags
@@ -124,7 +151,11 @@ airflow:
   # Airflow - Scheduler Configs
   ###################################
   scheduler:
+<<<<<<< HEAD
     nameOverride: "airflow-scheduler"
+=======
+
+>>>>>>> 9c280ca8cb5d26bc0449c4e9f0d691169c1b0531
     ## custom airflow connections for the airflow scheduler
     ##
     # connections:

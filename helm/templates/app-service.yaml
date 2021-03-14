@@ -9,11 +9,8 @@ spec:
     - name: {{ .Values.app.service.name }} 
       protocol: TCP
       port: {{ .Values.app.service.port }}
-<<<<<<< HEAD
       {{- if and (eq .Values.app.service.type "NodePort") (.Values.app.service.nodePort) }}
       nodePort: {{ .Values.app.service.nodePort }}
       {{- end }}
-=======
->>>>>>> 9c280ca8cb5d26bc0449c4e9f0d691169c1b0531
   selector: 
     {{- include "krwordcloud.app.matchLabels" . | nindent 4 }}

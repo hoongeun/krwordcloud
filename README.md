@@ -1,9 +1,9 @@
-# Krwordcloud
+# krwordcloud
 
 A korean local news wordcloud service with over-stack
 (WIP)
 
-## How to install
+## How to install(Not working)
 
 1. Install in Local machine(Single cluster)
 
@@ -52,11 +52,11 @@ A korean local news wordcloud service with over-stack
 ## Stack
 
 * application:
-  * front: react
+  * front: react(typescript)
   * backend: spring(kotlin)
 * database:
-  * presto: article(unprocessed data) store
   * couchbase: keyword-score(proccessed data) store
+  * hdfs: article storage with orc(Optimized row columnar)
 * datamining: spark-operator(pyspark)
   * keyword extracting algorithm: [krwordrank](https://github.com/lovit/KR-WordRank)
 * datacrawler: modified [korean_news_crawler](https://github.com/lumyjuwon/KoreaNewsCrawler)
@@ -69,4 +69,4 @@ A korean local news wordcloud service with over-stack
 ## Peoples
 * [Hoongeun Cho](https://github.com/hoongeun) (me@hoongeun.com): Architect, Project management, orchestration, application, spark
 
-* [Jinseong Choi](https://github.com/ysfactory): airflow, hive
+* [Jinseong Choi](https://github.com/ysfactory): airflow

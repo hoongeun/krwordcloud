@@ -1,6 +1,4 @@
 app:
-  host: http://localhost
-  port: 3000
   image:
     name: krwordcloud/app
     pullPolicy: Never
@@ -10,6 +8,7 @@ app:
     type: NodePort 
     name: krwordcloud-app
     port: 80
+    nodePort: 30000
   livenessProbe:
     enabled: false
     initialDelaySeconds: 120
@@ -39,7 +38,8 @@ api:
   service:
     type: NodePort 
     name: krwordcloud-api
-    port: 4000
+    port: 8080
+    nodePort: 30001
   livenessProbe:
     enabled: false
     initialDelaySeconds: 120
@@ -59,7 +59,7 @@ api:
   readinessProbeHeaders: {}
   healthcheckHttps: false
 ingress:
-  enabled: true
+  enabled: false
   tls: false
   hosts:
     - host: localhost:3000 
@@ -80,11 +80,11 @@ ingress:
               port: 4000
 
 airflow:
-  nameOverride: airflow
   ###################################
   # Airflow - Common Configs
   ###################################
   airflow:
+    nameOverride: airflow
     ## the airflow executor type to use
     ##
     executor: PythonExecutor
@@ -95,7 +95,7 @@ airflow:
 
     extraVolumeMounts: # this will get the volume and mount it to that path in the container
       - name: dags
-        mountPath: "$HOME/workspace/git/wordcloud/airflow/dags"  # location in the container it will put the directory mentioned below.
+        mountPath: "../airflow/dags"  # location in the container it will put the directory mentioned below.
 
     extraVolumes: # this will create the volume from the directory
       - name: dags
@@ -124,7 +124,7 @@ airflow:
   # Airflow - Scheduler Configs
   ###################################
   scheduler:
-
+    nameOverride: "airflow-scheduler"
     ## custom airflow connections for the airflow scheduler
     ##
     # connections:
@@ -153,15 +153,19 @@ airflow:
   # Airflow - WebUI Configs
   ###################################
   web:
+    nameOverride: "airflow-web"
     ## configs for the Service of the web Pods
     ##
     service:
       type: NodePort
+      nodePort:
+        http: 30400
 
   ###################################
   # Airflow - Worker Configs
   ###################################
   workers:
+    nameOverride: "airflow-workers"
     ## the number of workers Pods to run
     ##
     replicas: 1
@@ -186,24 +190,34 @@ airflow:
   redis:
     enabled: true
 
-kafka:
-  nameOverride: kafka
+  serviceMonitor:
+    enabled: true 
+
+cp-helm-charts:
+  cp-kafka:
+    # nameOverride: kafka
+    brokers: 1
+  cp-kafka-connect:
+    # nameOverride: kafka-connect 
+    kafka:
+      bootstrapServers: krwordcloud-kafka:9092 
+    cp-schema-registry:
+      url: http://krwordcloud-kafka-schema-registry:8081
   cp-zookeeper:
+    # nameOverride: kafka-zookeeper
     enabled: true
     servers: 1
-hive:
-  nameOverride: hive
+  cp-schema-registry:
+    # nameOverride: kafka-schema-registry
+
+hdfs:
   persistence:
     nameNode:
       enabled: true
-      storageClass: standard-ssd
-      accessMode: ReadWriteOnce
-      size: 10Gi
+      storageClass: standard
     dataNode:
       enabled: true
-      storageClass: standard-sdd
-      accessMode: ReadWriteOnce
-      size: 10Gi
+      storageClass: standard
 
 couchbase-operator:
   # Select what to install
@@ -217,16 +231,46 @@ couchbase-operator:
     # install sync gateway
     syncGateway: false
   cluster:
-    security:
-      adminSecret: couchbase-secret
-    cluster:
-  bucket: trend
+    monitoring:
+      prometheus:
+        # defines whether Prometheus metric collection is enabled
+        enabled: true
+        # image used by the Operator to perform metric collection
+        # (injected as a "sidecar" in each Couchbase Server Pod)
+        image: couchbase/exporter:1.0.3
 
 prometheus:
-  nameOverride: prometheus
+  server:
+    nameOverride: prometheus
+    service:
+      name: web
+      type: NodePort
+      nodePort: 30501
+      port: 9090
+      protocol: TCP
+  alertmanager:
+    persistentVolume:
+      storageClass: standard
+
 grafana:
   nameOverride: grafana
   service:
     type: NodePort
+    nodePort: 30500
     port: 80
-    targetPort: 5005
+    protocol: TCP
+    targetPort: 3000
+  persistence:
+    enabled: true
+    accessModes:
+      - ReadWriteOnce
+    size: 5Gi
+  datasources:
+   datasources.yaml:
+     apiVersion: 1
+     datasources:
+       - name: Prometheus
+         type: prometheus
+         url: http://krwordcloud-prometheus-server
+         access: proxy
+         isDefault: true

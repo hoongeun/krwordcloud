@@ -91,8 +91,6 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-NOTE: This utility template is needed until https://git.io/JvuGN is resolved.
-
 Call a template from the context of a subchart.
 
 Usage:
@@ -108,3 +106,4 @@ Usage:
 {{- end }}
 {{- include $template (dict "Chart" (dict "Name" (last $subchart)) "Values" $values "Release" $dot.Release "Capabilities" $dot.Capabilities) }}
 {{- end }}
+

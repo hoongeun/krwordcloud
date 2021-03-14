@@ -1,6 +1,15 @@
 dependencies:
+- name: airflow
+  repository: https://airflow-helm.github.io/charts
+  version: 7.16.0
 - name: couchbase-operator
   repository: https://couchbase-partners.github.io/helm-charts/
   version: 2.1.007
-digest: sha256:5e6bb9792269e681af02bcab177cfec0e442488fe5a9e3bea8676652ca7cd64e
-generated: "2021-02-26T15:30:25.017791+09:00"
+- name: cp-helm-charts
+  repository: https://confluentinc.github.io/cp-helm-charts/
+  version: 0.6.0
+- name: hdfs
+  repository: https://gradiant.github.io/charts
+  version: 0.1.10
+digest: sha256:7ca2ead642e938af666c9e6746265beec8b3a4451f21cf22fd740586849ca26d
+generated: "2021-03-14T13:38:04.049573424+09:00"

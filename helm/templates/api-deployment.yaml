@@ -47,9 +47,7 @@ spec:
                   key: bucket-password
           ports:
             - name: http
-              containerPort: 4000
-            - name: https
-              containerPort: 4001
+              containerPort: 8080
           {{- if .Values.api.livenessProbe.enabled }}
           livenessProbe:
             initialDelaySeconds: {{ .Values.api.livenessProbe.initialDelaySeconds }}

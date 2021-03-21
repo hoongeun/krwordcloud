@@ -3,16 +3,16 @@
 A korean local news wordcloud service with over-stack
 (WIP)
 
-## How to install(Not working)
+## How to install(Not working, Need to improve)
 
 1. Install in Local machine(Single cluster)
 
     ```bash
-    # Install kubernetes 
+    # Install kubernetes
     # Minikube guide - https://minikube.sigs.k8s.io/docs/start/
 
     # Install helm
-    # Helm - https://helm.sh/docs/intro/install/ 
+    # Helm - https://helm.sh/docs/intro/install/
 
     # Install nodejs
     # n guide - https://github.com/tj/n#installation
@@ -49,13 +49,13 @@ A korean local news wordcloud service with over-stack
 
 3. Options3, Will suppport) Install in native cluster(Multi cluster)
 
-## Stack
+## Stacks
 
 * application:
   * front: react(typescript)
   * backend: spring(kotlin)
 * database:
-  * couchbase: keyword-score(proccessed data) store
+  * couchbase: keyword-score(proccessed data) storage
   * hdfs: article storage with orc(Optimized row columnar)
 * datamining: spark-operator(pyspark)
   * keyword extracting algorithm: [krwordrank](https://github.com/lovit/KR-WordRank)
@@ -65,8 +65,13 @@ A korean local news wordcloud service with over-stack
 * monitoring: prometheus, grafana
 * scheduler: airflow
 * message queue: kafka(confluent-platform)
+  * hdfs 2 sink connector
+  * couchbase sink connector
 
-## Peoples
+## Architecture
+![krwordcloud architecture](./docs/images/architecture.png)
+
+## People
 * [Hoongeun Cho](https://github.com/hoongeun) (me@hoongeun.com): Architect, Project management, orchestration, application, spark
 
 * [Jinseong Choi](https://github.com/ysfactory): airflow

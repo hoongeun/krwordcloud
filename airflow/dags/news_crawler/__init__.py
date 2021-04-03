@@ -1,9 +1,9 @@
-__author__ = "lumyjuwon"
-__version__ = "1.50"
-__copyright__ = "Copyright (c) lumyjuwon"
-__license__ = "MIT"
+__author__ = "hoongeun"
+__version__ = "0.0.1"
+__copyright__ = "Copyright (c) hoongeun"
+__license__ = "Beer ware"
 
-from .articlecrawler import *
-from .articleparser import *
-from .exceptions import *
-from .sportcrawler import *
+# from .articlecrawler import *
+# from .articleparser import *
+# from .exceptions import *
+# from .utils import *

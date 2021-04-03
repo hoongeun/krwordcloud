@@ -5,7 +5,7 @@ app:
     # Overrides the image tag whose default is the chart appVersion.
     tag: latest
   service:
-    type: NodePort 
+    type: NodePort
     name: krwordcloud-app
     port: 80
     nodePort: 30000
@@ -36,7 +36,7 @@ api:
     # Overrides the image tag whose default is the chart appVersion.
     tag: latest
   service:
-    type: NodePort 
+    type: NodePort
     name: krwordcloud-api
     port: 8080
     nodePort: 30001
@@ -62,7 +62,7 @@ ingress:
   enabled: false
   tls: false
   hosts:
-    - host: localhost:3000 
+    - host: localhost:3000
       paths:
         - path: /
           pathType: Prefix
@@ -176,7 +176,7 @@ airflow:
   dags:
     persistence:
       enabled: true
-      
+
 
   ###################################
   # Database - PostgreSQL Chart
@@ -191,16 +191,16 @@ airflow:
     enabled: true
 
   serviceMonitor:
-    enabled: true 
+    enabled: true
 
 cp-helm-charts:
   cp-kafka:
     # nameOverride: kafka
     brokers: 1
   cp-kafka-connect:
-    # nameOverride: kafka-connect 
+    # nameOverride: kafka-connect
     kafka:
-      bootstrapServers: krwordcloud-kafka:9092 
+      bootstrapServers: krwordcloud-kafka:9092
     cp-schema-registry:
       url: http://krwordcloud-kafka-schema-registry:8081
   cp-zookeeper:
@@ -211,13 +211,33 @@ cp-helm-charts:
     # nameOverride: kafka-schema-registry
 
 hdfs:
+  dataNode:
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1024Mi
+  nameNode:
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1024Mi
   persistence:
     nameNode:
       enabled: true
       storageClass: standard
+      size: 20Gi
     dataNode:
       enabled: true
       storageClass: standard
+      size: 60Gi
+  dataNode:
+    replicas: 2
+    limits:
+      cpu: 512m
+      memory: 1024Mi
+  hdfs:
+    webhdfs:
+      enabled: true
 
 couchbase-operator:
   # Select what to install

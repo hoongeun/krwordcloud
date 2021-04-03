@@ -1,16 +1,22 @@
 package com.krwordcloud.api.config.couchbase
 
+import com.krwordcloud.api.entity.Stats
 import org.springframework.context.annotation.Configuration
+import org.springframework.data.couchbase.CouchbaseClientFactory
+import org.springframework.data.couchbase.SimpleCouchbaseClientFactory
 import org.springframework.data.couchbase.config.AbstractCouchbaseConfiguration
-import java.util.Properties
-import java.io.FileNotFoundException
+import org.springframework.data.couchbase.core.CouchbaseTemplate
+import org.springframework.data.couchbase.core.convert.MappingCouchbaseConverter
+import org.springframework.data.couchbase.repository.config.EnableCouchbaseRepositories
+import org.springframework.data.couchbase.repository.config.RepositoryOperationsMapping
 
 
 @Configuration
+@EnableCouchbaseRepositories(basePackages = ["package com.krwordcloud.api.repository"])
 class CouchbaseConfiguration : AbstractCouchbaseConfiguration() {
 
     override fun getConnectionString(): String {
-        return System.getenv("COUCHBASE_HOST") ?: "couchbase://127.0.0.1"
+        return "couchbase://${System.getenv("COUCHBASE_HOST") ?: "localhost"}"
     }
 
     override fun getUserName(): String {
@@ -22,55 +28,29 @@ class CouchbaseConfiguration : AbstractCouchbaseConfiguration() {
     }
 
     override fun getBucketName(): String {
-        return System.getenv("COUCHBASE_BUCKET") ?: "bucket"
+        return "Trend"
+    }
+
+    override fun configureRepositoryOperationsMapping(baseMapping: RepositoryOperationsMapping) {
+        try {
+            val statsTemplate = myCouchbaseTemplate(myCouchbaseClientFactory("Stats"), MappingCouchbaseConverter())
+            baseMapping.mapEntity(Stats::class.java, statsTemplate)
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+    // do not use couchbaseTemplate for the name of this method, otherwise the value of that been
+    // will be used instead of the result from this call (the client factory arg is different)
+    fun myCouchbaseTemplate(
+        couchbaseClientFactory: CouchbaseClientFactory,
+        mappingCouchbaseConverter: MappingCouchbaseConverter,
+    ): CouchbaseTemplate {
+        return CouchbaseTemplate(couchbaseClientFactory, mappingCouchbaseConverter)
+    }
+
+    // do not use couchbaseClientFactory for the name of this method, otherwise the value of that bean will
+    // will be used instead of this call being made ( bucketname is an arg here, instead of using bucketName() )
+    fun myCouchbaseClientFactory(bucketName: String): CouchbaseClientFactory {
+        return SimpleCouchbaseClientFactory(connectionString, authenticator(), bucketName)
     }
 }
-
-// FIXME: Environment variables are doens't loaded.
-//@Configuration
-//class CouchbaseConfiguration(private val prop: Properties) : AbstractCouchbaseConfiguration() {
-//
-//    override fun getConnectionString(): String {
-//        try {
-//            return prop.getProperty("spring.couchbase.host")
-//        } catch (e: Exception) {
-//            return "couchbase://127.0.0.1"
-//        }
-//    }
-//
-//    override fun getUserName(): String {
-//        try {
-//            return prop.getProperty("spring.couchbase.bucket.user")
-//        } catch (e: Exception) {
-//            return "Administrator"
-//        }
-//    }
-//
-//    override fun getPassword(): String {
-//        try {
-//            return prop.getProperty("spring.couchbase.bucket.password")
-//        } catch (e: Exception) {
-//            return "password"
-//        }
-//    }
-//
-//    override fun getBucketName(): String {
-//        try {
-//            return prop.getProperty("spring.couchbase.bucket.name")
-//        } catch (e: Exception) {
-//            return "bucket"
-//        }
-//    }
-//
-//    init {
-//        val fname = "application.properties"
-//        javaClass.classLoader.getResourceAsStream(fname).use {
-//            prop.apply { load(it) }
-//        }
-//
-//        println(prop.getProperty("spring.couchbase.host"))
-//        println(prop.getProperty("spring.couchbase.bucket.name"))
-//        println(prop.getProperty("spring.couchbase.bucket.user"))
-//        println(prop.getProperty("spring.couchbase.bucket.password"))
-//    }
-//}

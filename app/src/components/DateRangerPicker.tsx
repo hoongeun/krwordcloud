@@ -89,6 +89,8 @@ type DateRangePickerProps = Partial<
 > & {
   startDate: Moment;
   endDate: Moment;
+  minDate: Moment;
+  maxDate: Moment;
   onDatesChange: typeof DateRangePickerShape.onDatesChange;
 };
 
@@ -130,14 +132,14 @@ const DateRangePickerWrapper: React.FC<DateRangePickerProps> = (props) => {
       isOutsideRange={(day) => {
         if (focusedInput === "startDate") {
 
-          // Start date is not after today and not after end date and not before 2 years ago. 
-          return day.isAfter(moment(new Date())) || day.isBefore(moment('2021-01-01'));
+          // Start date is not after today and not after end date and not before 2 years ago.
+          return day.isAfter(props.maxDate) || day.isBefore(props.minDate);
         }
 
         if (focusedInput === "endDate") {
 
           // End date is not after today and not before start date
-          return day.isAfter(moment(new Date()));
+          return day.isAfter(props.maxDate);
         }
 
         return false;

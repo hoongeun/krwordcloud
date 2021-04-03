@@ -1,4 +1,4 @@
-package com.krwordcloud.api.repositories
+package com.krwordcloud.api.repository
 
 import com.krwordcloud.api.entity.Trend
 import org.springframework.data.couchbase.repository.CouchbaseRepository

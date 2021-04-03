@@ -1,7 +1,7 @@
-package com.krwordcloud.api.controller
+package com.krwordcloud.api.rest
 
+import com.krwordcloud.api.entity.Stats
 import com.krwordcloud.api.entity.dto.MergedTrend
-import com.krwordcloud.api.entity.dto.Stats
 import com.krwordcloud.api.entity.dto.TrendQuery
 import com.krwordcloud.api.service.TrendService
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
@@ -19,8 +19,13 @@ class TrendController(private val trendService: TrendService) {
         return trendService.findByRange(trendQuery)
     }
 
-    @RequestMapping(value = ["/stats"], method = [GET], produces = [APPLICATION_JSON_VALUE])
-    fun findStats(): Stats {
-        return trendService.findStats()
+    @RequestMapping(value = ["/stats/latest"], method = [GET], produces = [APPLICATION_JSON_VALUE])
+    fun findLatestStats(): Stats {
+        return trendService.findLatestStats()
+    }
+
+    @RequestMapping(value = ["/stats/list"], method = [GET], produces = [APPLICATION_JSON_VALUE])
+    fun findAllStats(): List<Stats> {
+        return trendService.findAllStats()
     }
 }
